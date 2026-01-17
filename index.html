@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NTK | Nicholas Kiboi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --ntk-yellow: #facc15;
+            --ntk-blue: #1e3a8a;
+        }
+        .bg-ntk-yellow { background-color: var(--ntk-yellow); }
+        .bg-ntk-blue { background-color: var(--ntk-blue); }
+        .text-ntk-blue { color: var(--ntk-blue); }
+        .border-ntk-blue { border-color: var(--ntk-blue); }
+        .modal-bg {
+            background: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-ntk-blue text-white p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold tracking-tighter">NTK <span class="text-yellow-400">Services</span></h1>
+            <div class="space-x-6 flex items-center">
+                <a href="#" onclick="showPage('home')" class="hover:text-yellow-400 transition">Home</a>
+                <a href="#" onclick="showPage('catalog')" class="hover:text-yellow-400 transition">Catalog</a>
+                <a href="#" onclick="showPage('location')" class="hover:text-yellow-400 transition">Location</a>
+                <a href="#" onclick="showPage('reviews')" class="hover:text-yellow-400 transition">Reviews</a>
+                <span id="user-nav"></span>
+                <button onclick="showPage('admin-login')" class="bg-yellow-400 text-blue-900 px-4 py-1 rounded-full font-bold hover:bg-white transition">Admin</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto py-8 px-4">
+        
+        <!-- Home Page -->
+        <section id="page-home" class="page-content">
+            <div class="bg-ntk-yellow p-12 rounded-3xl text-ntk-blue shadow-xl mb-12 flex flex-col items-center text-center">
+                <h2 class="text-5xl font-black mb-4">Welcome to NTK</h2>
+                <p class="text-xl mb-6 max-w-2xl">Owned and operated by <span class="font-bold underline">Nicholas Kiboi</span>. Delivering excellence in products and services with a touch of blue and yellow.</p>
+                <button onclick="showPage('catalog')" class="bg-ntk-blue text-white px-8 py-3 rounded-xl font-bold text-lg hover:scale-105 transition-transform">Explore Catalog</button>
+            </div>
+        </section>
+
+        <!-- Catalog Page -->
+        <section id="page-catalog" class="page-content hidden">
+            <h2 class="text-3xl font-bold text-ntk-blue mb-8 border-b-4 border-ntk-yellow inline-block">Our Products & Services</h2>
+            <div id="catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Products injected here -->
+            </div>
+        </section>
+
+        <!-- Admin Login Page -->
+        <section id="page-admin-login" class="page-content hidden">
+            <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-2xl border-t-8 border-ntk-blue">
+                <h2 class="text-2xl font-bold mb-6 text-center">Admin Access</h2>
+                <input type="password" id="admin-password" placeholder="Enter Password" class="w-full p-3 border-2 border-gray-200 rounded-lg mb-4 focus:border-ntk-blue outline-none" />
+                <button onclick="checkAdminLogin()" class="w-full bg-ntk-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition">Login</button>
+                <p id="login-error" class="text-red-500 text-sm mt-3 hidden text-center">Wrong password, bestie. Try again.</p>
+            </div>
+        </section>
+
+        <!-- Admin Dashboard -->
+        <section id="page-admin-dashboard" class="page-content hidden">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold">Admin Panel <span class="text-sm font-normal text-gray-500">(Logged in as Nicholas)</span></h2>
+                <button onclick="logout()" class="text-red-500 font-bold">Logout</button>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+                <!-- Add Product Form -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-md">
+                    <h3 class="font-bold mb-4 text-xl">Post New Item</h3>
+                    <div class="space-y-4">
+                        <input type="text" id="item-name" placeholder="Item Name" class="w-full p-2 border rounded-lg" />
+                        <select id="item-type" class="w-full p-2 border rounded-lg">
+                            <option value="Product">Product</option>
+                            <option value="Service">Service</option>
+                        </select>
+                        <input type="text" id="item-price" placeholder="Price (e.g. $50)" class="w-full p-2 border rounded-lg" />
+                        <textarea id="item-desc" placeholder="Description" class="w-full p-2 border rounded-lg h-24"></textarea>
+                        <input type="file" id="item-image" accept="image/*" class="w-full p-2 border rounded-lg" />
+                        <button onclick="addItem()" class="w-full bg-ntk-yellow text-blue-900 font-bold py-3 rounded-lg hover:bg-yellow-300">Publish to Site</button>
+                    </div>
+                </div>
+
+                <!-- Item Manager -->
+                <div class="lg:col-span-2">
+                    <h3 class="font-bold mb-4 text-xl">Manage Posts</h3>
+                    <div id="admin-item-list" class="space-y-4 mb-10">
+                        <!-- Items listed here for deletion -->
+                    </div>
+
+                    <h3 class="font-bold mb-4 text-xl">User Inquiries</h3>
+                    <div id="admin-inquiry-list" class="space-y-4 max-h-96 overflow-y-auto">
+                        <!-- User inquiries listed here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location Manager -->
+            <div class="bg-white p-6 rounded-2xl shadow-md mt-8">
+                <h3 class="font-bold mb-4 text-xl">Edit Location Page</h3>
+                <div class="space-y-4">
+                    <input type="text" id="loc-title" placeholder="Location Title" class="w-full p-2 border rounded-lg" />
+                    <textarea id="loc-address" placeholder="Business Address" class="w-full p-2 border rounded-lg h-20"></textarea>
+                    <input type="file" id="loc-image" accept="image/*" class="w-full p-2 border rounded-lg" />
+                    <button onclick="updateLocation()" class="w-full bg-ntk-blue text-white font-bold py-3 rounded-lg hover:bg-blue-800">Update Location</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Location Page -->
+        <section id="page-location" class="page-content hidden">
+            <h2 class="text-3xl font-bold text-ntk-blue mb-8 border-b-4 border-ntk-yellow inline-block">Our Location</h2>
+            <div id="location-content" class="bg-white p-8 rounded-2xl shadow-md">
+                <!-- Location content injected here -->
+            </div>
+        </section>
+
+        <!-- User Register Page -->
+        <section id="page-register" class="page-content hidden">
+            <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-2xl">
+                <h2 class="text-2xl font-bold mb-6 text-center">Create Account</h2>
+                <form id="register-form" class="space-y-4">
+                    <input type="text" id="reg-name" placeholder="Full Name" class="w-full p-3 border rounded-lg" required />
+                    <input type="number" id="reg-age" placeholder="Age" class="w-full p-3 border rounded-lg" required min="0" />
+                    <input type="text" id="reg-location" placeholder="Location" class="w-full p-3 border rounded-lg" required />
+                    <input type="tel" id="reg-phone" placeholder="Phone Number" class="w-full p-3 border rounded-lg" required />
+                    <input type="email" id="reg-email" placeholder="Email" class="w-full p-3 border rounded-lg" required />
+                    <input type="password" id="reg-password" placeholder="Password" class="w-full p-3 border rounded-lg" required />
+                    <button type="submit" class="w-full bg-ntk-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800">Register</button>
+                </form>
+                <p class="text-center mt-4 text-sm">Already have an account? <a href="#" onclick="showPage('login')" class="text-ntk-blue font-bold">Login</a></p>
+            </div>
+        </section>
+
+        <!-- User Login Page -->
+        <section id="page-login" class="page-content hidden">
+            <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-2xl">
+                <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+                <form id="login-form" class="space-y-4">
+                    <input type="email" id="login-email" placeholder="Email" class="w-full p-3 border rounded-lg" required />
+                    <input type="password" id="login-password" placeholder="Password" class="w-full p-3 border rounded-lg" required />
+                    <button type="submit" class="w-full bg-ntk-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800">Login</button>
+                    <p id="login-user-error" class="text-red-500 text-sm hidden text-center">Invalid credentials</p>
+                </form>
+                <p class="text-center mt-4 text-sm">Don't have an account? <a href="#" onclick="showPage('register')" class="text-ntk-blue font-bold">Register</a></p>
+            </div>
+        </section>
+
+        <!-- User Settings Page -->
+        <section id="page-settings" class="page-content hidden">
+            <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-2xl">
+                <h2 class="text-2xl font-bold mb-6 text-center">Account Settings</h2>
+                <form id="settings-form" class="space-y-4">
+                    <input type="text" id="set-name" placeholder="Full Name" class="w-full p-3 border rounded-lg" required />
+                    <input type="number" id="set-age" placeholder="Age" class="w-full p-3 border rounded-lg" required min="0" />
+                    <input type="text" id="set-location" placeholder="Location" class="w-full p-3 border rounded-lg" required />
+                    <input type="tel" id="set-phone" placeholder="Phone Number" class="w-full p-3 border rounded-lg" required />
+                    <input type="email" id="set-email" placeholder="Email" class="w-full p-3 border rounded-lg" required readonly />
+                    <button type="submit" class="w-full bg-ntk-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800">Update Settings</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Reviews Page -->
+        <section id="page-reviews" class="page-content hidden">
+            <h2 class="text-3xl font-bold text-ntk-blue mb-8 border-b-4 border-ntk-yellow inline-block">Customer Reviews</h2>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-md mb-8">
+                <h3 class="text-xl font-bold mb-4">Leave a Review</h3>
+                <form id="review-form" class="space-y-4">
+                    <div>
+                        <label class="block font-bold mb-2">Rating (1-7 stars)</label>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="setRating(1)" class="star-btn px-4 py-2 border-2 rounded-lg">1</button>
+                            <button type="button" onclick="setRating(2)" class="star-btn px-4 py-2 border-2 rounded-lg">2</button>
+                            <button type="button" onclick="setRating(3)" class="star-btn px-4 py-2 border-2 rounded-lg">3</button>
+                            <button type="button" onclick="setRating(4)" class="star-btn px-4 py-2 border-2 rounded-lg">4</button>
+                            <button type="button" onclick="setRating(5)" class="star-btn px-4 py-2 border-2 rounded-lg">5</button>
+                            <button type="button" onclick="setRating(6)" class="star-btn px-4 py-2 border-2 rounded-lg">6</button>
+                            <button type="button" onclick="setRating(7)" class="star-btn px-4 py-2 border-2 rounded-lg">7</button>
+                        </div>
+                        <input type="hidden" id="review-rating" required />
+                    </div>
+                    <textarea id="review-message" placeholder="Share your experience..." class="w-full p-3 border rounded-lg h-32" required></textarea>
+                    <input type="file" id="review-image" accept="image/*" class="w-full p-2 border rounded-lg" />
+                    <button type="submit" class="w-full bg-ntk-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800">Submit Review</button>
+                </form>
+            </div>
+
+            <div id="reviews-list" class="space-y-6">
+                <!-- Reviews displayed here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Inquiry Modal -->
+    <div id="inquiry-modal" class="fixed inset-0 hidden items-center justify-center modal-bg z-50">
+        <div class="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl relative">
+            <h3 class="text-2xl font-bold mb-4 text-ntk-blue">Product Inquiry</h3>
+            <form id="inquiry-form" class="space-y-4">
+                <input type="text" id="inq-product-name" readonly class="w-full p-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
+
+                <input type="text" id="inq-name" placeholder="Your Name" class="w-full p-2 border rounded-lg" required />
+                <input type="number" id="inq-age" placeholder="Your Age" class="w-full p-2 border rounded-lg" required min="0" />
+                <input type="text" id="inq-location" placeholder="Your Location" class="w-full p-2 border rounded-lg" required />
+                <input type="tel" id="inq-phone" placeholder="Your Phone Number" class="w-full p-2 border rounded-lg" required pattern="[\d\s+\-()]{6,}" title="Enter a valid phone number" />
+                <input type="email" id="inq-email" placeholder="Your Email" class="w-full p-2 border rounded-lg" required />
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="closeInquiryModal()" class="bg-gray-300 py-2 px-5 rounded-lg hover:bg-gray-400 transition">Cancel</button>
+                    <button type="submit" class="bg-ntk-blue text-white py-2 px-6 rounded-lg font-bold hover:bg-blue-800 transition">Send Inquiry</button>
+                </div>
+            </form>
+            <button onclick="closeInquiryModal()" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold leading-none">&times;</button>
+        </div>
+    </div>
+
+    <!-- UI Components for Notifications -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-ntk-blue text-white px-6 py-3 rounded-lg shadow-2xl translate-y-20 transition-transform duration-300 pointer-events-none">
+        Saved successfully!
+    </div>
+
+<script>
+    // State Management
+    let items = JSON.parse(localStorage.getItem('ntk_items')) || [
+        { id: 1, name: "Consultation", type: "Service", price: "$100", desc: "Premium business advice from Nicholas Kiboi." },
+        { id: 2, name: "NTK Merch", type: "Product", price: "$25", desc: "Stay stylish with the official NTK hoodie." }
+    ];
+    let inquiries = JSON.parse(localStorage.getItem('ntk_inquiries')) || [];
+    let locationData = JSON.parse(localStorage.getItem('ntk_location')) || {
+        title: "Visit Us",
+        address: "123 Business Street, City, Country",
+        image: ""
+    };
+    let users = JSON.parse(localStorage.getItem('ntk_users')) || [];
+    let currentUser = JSON.parse(localStorage.getItem('ntk_current_user')) || null;
+    let reviews = JSON.parse(localStorage.getItem('ntk_reviews')) || [];
+    let selectedRating = 0;
+
+    // Navigation Engine
+    function showPage(pageId) {
+        document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+        document.getElementById(`page-${pageId}`).classList.remove('hidden');
+        
+        if (pageId === 'catalog' || pageId === 'home') renderCatalog();
+        if (pageId === 'location') renderLocation();
+        if (pageId === 'settings') loadSettings();
+        if (pageId === 'reviews') renderReviews();
+        if (pageId === 'admin-dashboard') {
+            renderAdminList();
+            renderInquiryList();
+            loadLocationForm();
+        }
+    }
+
+    function updateUserNav() {
+        const nav = document.getElementById('user-nav');
+        if (currentUser) {
+            nav.innerHTML = `
+                <a href="#" onclick="showPage('settings')" class="hover:text-yellow-400 transition">Settings</a>
+                <button onclick="userLogout()" class="text-yellow-400 hover:text-white transition">Logout</button>
+            `;
+        } else {
+            nav.innerHTML = `<a href="#" onclick="showPage('login')" class="hover:text-yellow-400 transition">Login</a>`;
+        }
+    }
+
+    // Auth Logic
+    function checkAdminLogin() {
+        const pass = document.getElementById('admin-password').value;
+        if (pass === 'nick@5djey') {
+            document.getElementById('admin-password').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+            showPage('admin-dashboard');
+        } else {
+            document.getElementById('login-error').classList.remove('hidden');
+        }
+    }
+
+    function logout() {
+        showPage('home');
+    }
+
+    // User Auth
+    function userLogout() {
+        currentUser = null;
+        localStorage.removeItem('ntk_current_user');
+        updateUserNav();
+        showPage('home');
+        showToast('Logged out successfully');
+    }
+
+    document.getElementById('register-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const user = {
+            name: document.getElementById('reg-name').value.trim(),
+            age: document.getElementById('reg-age').value.trim(),
+            location: document.getElementById('reg-location').value.trim(),
+            phone: document.getElementById('reg-phone').value.trim(),
+            email: document.getElementById('reg-email').value.trim(),
+            password: document.getElementById('reg-password').value
+        };
+
+        if (users.find(u => u.email === user.email)) {
+            alert('Email already registered');
+            return;
+        }
+
+        users.push(user);
+        localStorage.setItem('ntk_users', JSON.stringify(users));
+        currentUser = user;
+        localStorage.setItem('ntk_current_user', JSON.stringify(currentUser));
+        updateUserNav();
+        showPage('home');
+        showToast('Account created successfully!');
+    });
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        const user = users.find(u => u.email === email && u.password === password);
+
+        if (user) {
+            currentUser = user;
+            localStorage.setItem('ntk_current_user', JSON.stringify(currentUser));
+            updateUserNav();
+            showPage('home');
+            showToast('Logged in successfully!');
+            document.getElementById('login-user-error').classList.add('hidden');
+        } else {
+            document.getElementById('login-user-error').classList.remove('hidden');
+        }
+    });
+
+    document.getElementById('settings-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        currentUser.name = document.getElementById('set-name').value.trim();
+        currentUser.age = document.getElementById('set-age').value.trim();
+        currentUser.location = document.getElementById('set-location').value.trim();
+        currentUser.phone = document.getElementById('set-phone').value.trim();
+
+        const userIndex = users.findIndex(u => u.email === currentUser.email);
+        users[userIndex] = currentUser;
+        localStorage.setItem('ntk_users', JSON.stringify(users));
+        localStorage.setItem('ntk_current_user', JSON.stringify(currentUser));
+        showToast('Settings updated!');
+    });
+
+    function loadSettings() {
+        if (!currentUser) {
+            showPage('login');
+            return;
+        }
+        document.getElementById('set-name').value = currentUser.name;
+        document.getElementById('set-age').value = currentUser.age;
+        document.getElementById('set-location').value = currentUser.location;
+        document.getElementById('set-phone').value = currentUser.phone;
+        document.getElementById('set-email').value = currentUser.email;
+    }
+
+    // Data Management
+    function addItem() {
+        const name = document.getElementById('item-name').value.trim();
+        const type = document.getElementById('item-type').value;
+        const price = document.getElementById('item-price').value.trim();
+        const desc = document.getElementById('item-desc').value.trim();
+        const imageFile = document.getElementById('item-image').files[0];
+
+        if (!name || !price) {
+            alert("Fill the blanks, Nicholas!");
+            return;
+        }
+
+        const newItem = {
+            id: Date.now(),
+            name, type, price, desc, image: ""
+        };
+
+        if (imageFile) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                newItem.image = e.target.result;
+                items.push(newItem);
+                saveData();
+                resetItemForm();
+                renderAdminList();
+                showToast("Successfully posted!");
+            };
+            reader.readAsDataURL(imageFile);
+        } else {
+            items.push(newItem);
+            saveData();
+            resetItemForm();
+            renderAdminList();
+            showToast("Successfully posted!");
+        }
+    }
+
+    function resetItemForm() {
+        document.getElementById('item-name').value = '';
+        document.getElementById('item-price').value = '';
+        document.getElementById('item-desc').value = '';
+        document.getElementById('item-image').value = '';
+    }
+
+    function updateLocation() {
+        const title = document.getElementById('loc-title').value.trim();
+        const address = document.getElementById('loc-address').value.trim();
+        const imageFile = document.getElementById('loc-image').files[0];
+
+        if (!title || !address) {
+            alert("Fill in title and address!");
+            return;
+        }
+
+        locationData.title = title;
+        locationData.address = address;
+
+        if (imageFile) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                locationData.image = e.target.result;
+                saveLocation();
+                showToast("Location updated!");
+            };
+            reader.readAsDataURL(imageFile);
+        } else {
+            saveLocation();
+            showToast("Location updated!");
+        }
+    }
+
+    function loadLocationForm() {
+        document.getElementById('loc-title').value = locationData.title;
+        document.getElementById('loc-address').value = locationData.address;
+    }
+
+    function saveLocation() {
+        localStorage.setItem('ntk_location', JSON.stringify(locationData));
+    }
+
+    function deleteItem(id) {
+        items = items.filter(item => item.id !== id);
+        saveData();
+        renderAdminList();
+        renderCatalog();
+        showToast("Deleted item.");
+    }
+
+    function saveData() {
+        localStorage.setItem('ntk_items', JSON.stringify(items));
+    }
+
+    function saveInquiries() {
+        localStorage.setItem('ntk_inquiries', JSON.stringify(inquiries));
+    }
+
+    // UI Rendering
+    function renderCatalog() {
+        const grid = document.getElementById('catalog-grid');
+        grid.innerHTML = items.map(item => `
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden border-b-4 border-ntk-yellow hover:shadow-xl transition">
+                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-full h-48 object-cover" />` : ''}
+                <div class="p-6">
+                    <span class="text-xs font-bold uppercase tracking-widest text-gray-400">${item.type}</span>
+                    <h3 class="text-xl font-bold text-ntk-blue mt-1">${item.name}</h3>
+                    <p class="text-gray-600 mt-2 text-sm">${item.desc}</p>
+                    <div class="mt-4 flex justify-between items-center">
+                        <span class="text-2xl font-black text-ntk-blue">${item.price}</span>
+                        <button onclick="openInquiryModal(${item.id})" class="bg-ntk-blue text-white px-4 py-2 rounded-lg text-sm font-bold">Inquire</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderLocation() {
+        const content = document.getElementById('location-content');
+        content.innerHTML = `
+            <h3 class="text-2xl font-bold text-ntk-blue mb-4">${locationData.title}</h3>
+            ${locationData.image ? `<img src="${locationData.image}" alt="Location" class="w-full max-w-2xl h-64 object-cover rounded-lg mb-6" />` : ''}
+            <p class="text-lg text-gray-700 whitespace-pre-line">${locationData.address}</p>
+        `;
+    }
+
+    function renderAdminList() {
+        const list = document.getElementById('admin-item-list');
+        list.innerHTML = items.map(item => `
+            <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border-l-4 border-ntk-blue">
+                <div>
+                    <h4 class="font-bold">${item.name} <span class="text-xs text-gray-400 ml-2">(${item.type})</span></h4>
+                    <p class="text-sm text-gray-500">${item.price}</p>
+                </div>
+                <button onclick="deleteItem(${item.id})" class="text-red-400 hover:text-red-600 font-bold p-2">Remove</button>
+            </div>
+        `).join('');
+    }
+
+    function renderInquiryList() {
+        const list = document.getElementById('admin-inquiry-list');
+        if (inquiries.length === 0) {
+            list.innerHTML = `<p class="text-gray-500">No inquiries yet.</p>`;
+            return;
+        }
+        list.innerHTML = inquiries.map(i => `
+            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-yellow-400 space-y-1 text-sm">
+                <p><span class="font-bold">Item:</span> ${i.productName}</p>
+                <p><span class="font-bold">Name:</span> ${i.name}, <span class="font-bold">Age:</span> ${i.age}</p>
+                <p><span class="font-bold">Location:</span> ${i.location}</p>
+                <p><span class="font-bold">Phone:</span> ${i.phone}</p>
+                <p><span class="font-bold">Email:</span> ${i.email}</p>
+                <p class="text-gray-400 text-xs">Submitted: ${new Date(i.timestamp).toLocaleString()}</p>
+            </div>
+        `).join('');
+    }
+
+    // Inquiry Modal Logic
+    function openInquiryModal(productId) {
+        const item = items.find(i => i.id === productId);
+        if (!item) return;
+        document.getElementById('inq-product-name').value = item.name;
+        
+        if (currentUser) {
+            document.getElementById('inq-name').value = currentUser.name;
+            document.getElementById('inq-age').value = currentUser.age;
+            document.getElementById('inq-location').value = currentUser.location;
+            document.getElementById('inq-phone').value = currentUser.phone;
+            document.getElementById('inq-email').value = currentUser.email;
+        } else {
+            document.getElementById('inq-name').value = '';
+            document.getElementById('inq-age').value = '';
+            document.getElementById('inq-location').value = '';
+            document.getElementById('inq-phone').value = '';
+            document.getElementById('inq-email').value = '';
+        }
+        
+        document.getElementById('inquiry-modal').classList.remove('hidden');
+        document.getElementById('inquiry-modal').classList.add('flex');
+    }
+
+    function closeInquiryModal() {
+        document.getElementById('inquiry-modal').classList.add('hidden');
+        document.getElementById('inquiry-modal').classList.remove('flex');
+    }
+
+    document.getElementById('inquiry-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // Collect values
+        const productName = document.getElementById('inq-product-name').value.trim();
+        const name = document.getElementById('inq-name').value.trim();
+        const age = parseInt(document.getElementById('inq-age').value.trim(), 10);
+        const location = document.getElementById('inq-location').value.trim();
+        const phone = document.getElementById('inq-phone').value.trim();
+        const email = document.getElementById('inq-email').value.trim();
+
+        if (!name || !age || !location || !phone || !email) {
+            alert("Please complete all fields.");
+            return;
+        }
+
+        // Store inquiry object
+        const newInquiry = {
+            id: Date.now(),
+            productName,
+            name,
+            age,
+            location,
+            phone,
+            email,
+            timestamp: Date.now()
+        };
+
+        inquiries.push(newInquiry);
+        saveInquiries();
+        closeInquiryModal();
+        showToast("Inquiry sent! Thank you.");
+    });
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.classList.remove('translate-y-20');
+        setTimeout(() => {
+            toast.classList.add('translate-y-20');
+        }, 3000);
+    }
+
+    // Reviews Logic
+    function setRating(rating) {
+        selectedRating = rating;
+        document.getElementById('review-rating').value = rating;
+        document.querySelectorAll('.star-btn').forEach((btn, idx) => {
+            if (idx < rating) {
+                btn.classList.add('bg-ntk-yellow', 'border-ntk-yellow', 'text-blue-900', 'font-bold');
+            } else {
+                btn.classList.remove('bg-ntk-yellow', 'border-ntk-yellow', 'text-blue-900', 'font-bold');
+            }
+        });
+    }
+
+    document.getElementById('review-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const rating = parseInt(document.getElementById('review-rating').value);
+        const message = document.getElementById('review-message').value.trim();
+        const imageFile = document.getElementById('review-image').files[0];
+
+        if (!rating || !message) {
+            alert('Please provide a rating and message');
+            return;
+        }
+
+        const review = {
+            id: Date.now(),
+            rating,
+            message,
+            image: '',
+            userName: currentUser ? currentUser.name : 'Anonymous',
+            timestamp: Date.now()
+        };
+
+        if (imageFile) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                review.image = e.target.result;
+                reviews.push(review);
+                saveReviews();
+                resetReviewForm();
+                renderReviews();
+                showToast('Review submitted!');
+            };
+            reader.readAsDataURL(imageFile);
+        } else {
+            reviews.push(review);
+            saveReviews();
+            resetReviewForm();
+            renderReviews();
+            showToast('Review submitted!');
+        }
+    });
+
+    function resetReviewForm() {
+        document.getElementById('review-message').value = '';
+        document.getElementById('review-image').value = '';
+        document.getElementById('review-rating').value = '';
+        selectedRating = 0;
+        document.querySelectorAll('.star-btn').forEach(btn => {
+            btn.classList.remove('bg-ntk-yellow', 'border-ntk-yellow', 'text-blue-900', 'font-bold');
+        });
+    }
+
+    function saveReviews() {
+        localStorage.setItem('ntk_reviews', JSON.stringify(reviews));
+    }
+
+    function renderReviews() {
+        const list = document.getElementById('reviews-list');
+        if (reviews.length === 0) {
+            list.innerHTML = '<p class="text-gray-500 text-center">No reviews yet. Be the first to review!</p>';
+            return;
+        }
+        list.innerHTML = reviews.slice().reverse().map(r => `
+            <div class="bg-white p-6 rounded-2xl shadow-md">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <p class="font-bold text-lg">${r.userName}</p>
+                        <p class="text-sm text-gray-500">${new Date(r.timestamp).toLocaleDateString()}</p>
+                    </div>
+                    <div class="flex gap-1">
+                        ${Array(r.rating).fill('⭐').join('')}
+                        <span class="ml-2 font-bold text-ntk-blue">${r.rating}/7</span>
+                    </div>
+                </div>
+                <p class="text-gray-700 mb-4">${r.message}</p>
+                ${r.image ? `<img src="${r.image}" alt="Review" class="w-full max-w-md h-64 object-cover rounded-lg" />` : ''}
+            </div>
+        `).join('');
+    }
+
+    // Init
+    window.onload = () => {
+        renderCatalog();
+        updateUserNav();
+    };
+</script>
+</body>
+</html>

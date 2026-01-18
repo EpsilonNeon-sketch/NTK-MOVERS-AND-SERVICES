@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="./ntk logo 2.jpeg" />
     <title>NTK | Nicholas Kiboi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -17,6 +18,11 @@
         .modal-bg {
             background: rgba(0, 0, 0, 0.5);
         }
+        #mobile-menu { display: none; }
+        @media (max-width: 768px) {
+            #desktop-nav { display: none; }
+            #mobile-menu-btn { display: block; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-900">
@@ -24,15 +30,24 @@
     <!-- Navigation -->
     <nav class="bg-ntk-blue text-white p-4 shadow-lg sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold tracking-tighter">NTK <span class="text-yellow-400">Services</span></h1>
-            <div class="space-x-6 flex items-center">
+            <h1 class="text-xl md:text-2xl font-bold tracking-tighter">NTK <span class="text-yellow-400">Services</span></h1>
+            <div id="desktop-nav" class="space-x-2 md:space-x-6 flex items-center text-sm md:text-base">
                 <a href="#" onclick="showPage('home')" class="hover:text-yellow-400 transition">Home</a>
                 <a href="#" onclick="showPage('catalog')" class="hover:text-yellow-400 transition">Catalog</a>
                 <a href="#" onclick="showPage('location')" class="hover:text-yellow-400 transition">Location</a>
                 <a href="#" onclick="showPage('reviews')" class="hover:text-yellow-400 transition">Reviews</a>
                 <span id="user-nav"></span>
-                <button onclick="showPage('admin-login')" class="bg-yellow-400 text-blue-900 px-4 py-1 rounded-full font-bold hover:bg-white transition">Admin</button>
+                <button onclick="showPage('admin-login')" class="bg-yellow-400 text-blue-900 px-2 md:px-4 py-1 rounded-full font-bold hover:bg-white transition text-xs md:text-base">Admin</button>
             </div>
+            <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="hidden text-2xl">☰</button>
+        </div>
+        <div id="mobile-menu" class="mt-4 space-y-2">
+            <a href="#" onclick="showPage('home'); toggleMobileMenu()" class="block py-2 hover:bg-blue-900 px-2 rounded">Home</a>
+            <a href="#" onclick="showPage('catalog'); toggleMobileMenu()" class="block py-2 hover:bg-blue-900 px-2 rounded">Catalog</a>
+            <a href="#" onclick="showPage('location'); toggleMobileMenu()" class="block py-2 hover:bg-blue-900 px-2 rounded">Location</a>
+            <a href="#" onclick="showPage('reviews'); toggleMobileMenu()" class="block py-2 hover:bg-blue-900 px-2 rounded">Reviews</a>
+            <span id="user-nav-mobile"></span>
+            <button onclick="showPage('admin-login'); toggleMobileMenu()" class="w-full text-left py-2 hover:bg-blue-900 px-2 rounded">Admin</button>
         </div>
     </nav>
 
@@ -41,25 +56,26 @@
         
         <!-- Home Page -->
         <section id="page-home" class="page-content">
-            <div class="bg-ntk-yellow p-12 rounded-3xl text-ntk-blue shadow-xl mb-12 flex flex-col items-center text-center">
-                <h2 class="text-5xl font-black mb-4">Welcome to NTK</h2>
-                <p class="text-xl mb-6 max-w-2xl">Owned and operated by <span class="font-bold underline">Nicholas Kiboi</span>. Delivering excellence in products and services with a touch of blue and yellow.</p>
-                <button onclick="showPage('catalog')" class="bg-ntk-blue text-white px-8 py-3 rounded-xl font-bold text-lg hover:scale-105 transition-transform">Explore Catalog</button>
+            <img src="./ntk logo 2.jpeg" alt="NTK Logo" class="w-32 h-32 md:w-48 md:h-48 mx-auto mb-6 rounded-full object-cover shadow-lg" />
+            <div class="bg-ntk-yellow p-6 md:p-12 rounded-3xl text-ntk-blue shadow-xl mb-12 flex flex-col items-center text-center">
+                <h2 class="text-3xl md:text-5xl font-black mb-4">Welcome to NTK</h2>
+                <p class="text-base md:text-xl mb-6 max-w-2xl">Owned and operated by <span class="font-bold underline">Nicholas Kiboi</span>. Delivering excellence in products and services with a touch of blue and yellow.</p>
+                <button onclick="showPage('catalog')" class="bg-ntk-blue text-white px-6 md:px-8 py-2 md:py-3 rounded-xl font-bold text-base md:text-lg hover:scale-105 transition-transform">Explore Catalog</button>
             </div>
         </section>
 
         <!-- Catalog Page -->
         <section id="page-catalog" class="page-content hidden">
-            <h2 class="text-3xl font-bold text-ntk-blue mb-8 border-b-4 border-ntk-yellow inline-block">Our Products & Services</h2>
-            <div id="catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h2 class="text-2xl md:text-3xl font-bold text-ntk-blue mb-6 md:mb-8 border-b-4 border-ntk-yellow inline-block">Our Products & Services</h2>
+            <div id="catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 <!-- Products injected here -->
             </div>
         </section>
 
         <!-- Admin Login Page -->
         <section id="page-admin-login" class="page-content hidden">
-            <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-2xl border-t-8 border-ntk-blue">
-                <h2 class="text-2xl font-bold mb-6 text-center">Admin Access</h2>
+            <div class="max-w-md mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-2xl border-t-8 border-ntk-blue">
+                <h2 class="text-xl md:text-2xl font-bold mb-6 text-center">Admin Access</h2>
                 <input type="password" id="admin-password" placeholder="Enter Password" class="w-full p-3 border-2 border-gray-200 rounded-lg mb-4 focus:border-ntk-blue outline-none" />
                 <button onclick="checkAdminLogin()" class="w-full bg-ntk-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition">Login</button>
                 <p id="login-error" class="text-red-500 text-sm mt-3 hidden text-center">Wrong password, bestie. Try again.</p>
@@ -68,8 +84,8 @@
 
         <!-- Admin Dashboard -->
         <section id="page-admin-dashboard" class="page-content hidden">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-3xl font-bold">Admin Panel <span class="text-sm font-normal text-gray-500">(Logged in as Nicholas)</span></h2>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-2">
+                <h2 class="text-xl md:text-3xl font-bold">Admin Panel <span class="text-xs md:text-sm font-normal text-gray-500 block md:inline">(Logged in as Nicholas)</span></h2>
                 <button onclick="logout()" class="text-red-500 font-bold">Logout</button>
             </div>
             
@@ -118,16 +134,16 @@
 
         <!-- Location Page -->
         <section id="page-location" class="page-content hidden">
-            <h2 class="text-3xl font-bold text-ntk-blue mb-8 border-b-4 border-ntk-yellow inline-block">Our Location</h2>
-            <div id="location-content" class="bg-white p-8 rounded-2xl shadow-md">
+            <h2 class="text-2xl md:text-3xl font-bold text-ntk-blue mb-6 md:mb-8 border-b-4 border-ntk-yellow inline-block">Our Location</h2>
+            <div id="location-content" class="bg-white p-6 md:p-8 rounded-2xl shadow-md">
                 <!-- Location content injected here -->
             </div>
         </section>
 
         <!-- User Register Page -->
         <section id="page-register" class="page-content hidden">
-            <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-2xl">
-                <h2 class="text-2xl font-bold mb-6 text-center">Create Account</h2>
+            <div class="max-w-md mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-2xl">
+                <h2 class="text-xl md:text-2xl font-bold mb-6 text-center">Create Account</h2>
                 <form id="register-form" class="space-y-4">
                     <input type="text" id="reg-name" placeholder="Full Name" class="w-full p-3 border rounded-lg" required />
                     <input type="number" id="reg-age" placeholder="Age" class="w-full p-3 border rounded-lg" required min="0" />
@@ -143,8 +159,8 @@
 
         <!-- User Login Page -->
         <section id="page-login" class="page-content hidden">
-            <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-2xl">
-                <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+            <div class="max-w-md mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-2xl">
+                <h2 class="text-xl md:text-2xl font-bold mb-6 text-center">Login</h2>
                 <form id="login-form" class="space-y-4">
                     <input type="email" id="login-email" placeholder="Email" class="w-full p-3 border rounded-lg" required />
                     <input type="password" id="login-password" placeholder="Password" class="w-full p-3 border rounded-lg" required />
@@ -157,8 +173,8 @@
 
         <!-- User Settings Page -->
         <section id="page-settings" class="page-content hidden">
-            <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-2xl">
-                <h2 class="text-2xl font-bold mb-6 text-center">Account Settings</h2>
+            <div class="max-w-md mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-2xl">
+                <h2 class="text-xl md:text-2xl font-bold mb-6 text-center">Account Settings</h2>
                 <form id="settings-form" class="space-y-4">
                     <input type="text" id="set-name" placeholder="Full Name" class="w-full p-3 border rounded-lg" required />
                     <input type="number" id="set-age" placeholder="Age" class="w-full p-3 border rounded-lg" required min="0" />
@@ -172,21 +188,21 @@
 
         <!-- Reviews Page -->
         <section id="page-reviews" class="page-content hidden">
-            <h2 class="text-3xl font-bold text-ntk-blue mb-8 border-b-4 border-ntk-yellow inline-block">Customer Reviews</h2>
+            <h2 class="text-2xl md:text-3xl font-bold text-ntk-blue mb-6 md:mb-8 border-b-4 border-ntk-yellow inline-block">Customer Reviews</h2>
             
-            <div class="bg-white p-6 rounded-2xl shadow-md mb-8">
-                <h3 class="text-xl font-bold mb-4">Leave a Review</h3>
+            <div class="bg-white p-4 md:p-6 rounded-2xl shadow-md mb-6 md:mb-8">
+                <h3 class="text-lg md:text-xl font-bold mb-4">Leave a Review</h3>
                 <form id="review-form" class="space-y-4">
                     <div>
-                        <label class="block font-bold mb-2">Rating (1-7 stars)</label>
-                        <div class="flex gap-2">
-                            <button type="button" onclick="setRating(1)" class="star-btn px-4 py-2 border-2 rounded-lg">1</button>
-                            <button type="button" onclick="setRating(2)" class="star-btn px-4 py-2 border-2 rounded-lg">2</button>
-                            <button type="button" onclick="setRating(3)" class="star-btn px-4 py-2 border-2 rounded-lg">3</button>
-                            <button type="button" onclick="setRating(4)" class="star-btn px-4 py-2 border-2 rounded-lg">4</button>
-                            <button type="button" onclick="setRating(5)" class="star-btn px-4 py-2 border-2 rounded-lg">5</button>
-                            <button type="button" onclick="setRating(6)" class="star-btn px-4 py-2 border-2 rounded-lg">6</button>
-                            <button type="button" onclick="setRating(7)" class="star-btn px-4 py-2 border-2 rounded-lg">7</button>
+                        <label class="block font-bold mb-2 text-sm md:text-base">Rating (1-7 stars)</label>
+                        <div class="flex gap-1 md:gap-2 flex-wrap">
+                            <button type="button" onclick="setRating(1)" class="star-btn px-3 md:px-4 py-2 border-2 rounded-lg text-sm md:text-base">1</button>
+                            <button type="button" onclick="setRating(2)" class="star-btn px-3 md:px-4 py-2 border-2 rounded-lg text-sm md:text-base">2</button>
+                            <button type="button" onclick="setRating(3)" class="star-btn px-3 md:px-4 py-2 border-2 rounded-lg text-sm md:text-base">3</button>
+                            <button type="button" onclick="setRating(4)" class="star-btn px-3 md:px-4 py-2 border-2 rounded-lg text-sm md:text-base">4</button>
+                            <button type="button" onclick="setRating(5)" class="star-btn px-3 md:px-4 py-2 border-2 rounded-lg text-sm md:text-base">5</button>
+                            <button type="button" onclick="setRating(6)" class="star-btn px-3 md:px-4 py-2 border-2 rounded-lg text-sm md:text-base">6</button>
+                            <button type="button" onclick="setRating(7)" class="star-btn px-3 md:px-4 py-2 border-2 rounded-lg text-sm md:text-base">7</button>
                         </div>
                         <input type="hidden" id="review-rating" required />
                     </div>
@@ -203,9 +219,9 @@
     </main>
 
     <!-- Inquiry Modal -->
-    <div id="inquiry-modal" class="fixed inset-0 hidden items-center justify-center modal-bg z-50">
-        <div class="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl relative">
-            <h3 class="text-2xl font-bold mb-4 text-ntk-blue">Product Inquiry</h3>
+    <div id="inquiry-modal" class="fixed inset-0 hidden items-center justify-center modal-bg z-50 p-4">
+        <div class="bg-white rounded-xl p-4 md:p-6 max-w-lg w-full shadow-2xl relative">
+            <h3 class="text-xl md:text-2xl font-bold mb-4 text-ntk-blue">Product Inquiry</h3>
             <form id="inquiry-form" class="space-y-4">
                 <input type="text" id="inq-product-name" readonly class="w-full p-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
 
@@ -263,14 +279,24 @@
 
     function updateUserNav() {
         const nav = document.getElementById('user-nav');
-        if (currentUser) {
-            nav.innerHTML = `
-                <a href="#" onclick="showPage('settings')" class="hover:text-yellow-400 transition">Settings</a>
-                <button onclick="userLogout()" class="text-yellow-400 hover:text-white transition">Logout</button>
-            `;
-        } else {
-            nav.innerHTML = `<a href="#" onclick="showPage('login')" class="hover:text-yellow-400 transition">Login</a>`;
-        }
+        const navMobile = document.getElementById('user-nav-mobile');
+        const content = currentUser ? `
+            <a href="#" onclick="showPage('settings')" class="hover:text-yellow-400 transition">Settings</a>
+            <button onclick="userLogout()" class="text-yellow-400 hover:text-white transition">Logout</button>
+        ` : `<a href="#" onclick="showPage('login')" class="hover:text-yellow-400 transition">Login</a>`;
+        
+        const mobileContent = currentUser ? `
+            <a href="#" onclick="showPage('settings'); toggleMobileMenu()" class="block py-2 hover:bg-blue-900 px-2 rounded">Settings</a>
+            <button onclick="userLogout(); toggleMobileMenu()" class="w-full text-left py-2 hover:bg-blue-900 px-2 rounded">Logout</button>
+        ` : `<a href="#" onclick="showPage('login'); toggleMobileMenu()" class="block py-2 hover:bg-blue-900 px-2 rounded">Login</a>`;
+        
+        nav.innerHTML = content;
+        navMobile.innerHTML = mobileContent;
+    }
+
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
 
     // Auth Logic
@@ -668,19 +694,19 @@
             return;
         }
         list.innerHTML = reviews.slice().reverse().map(r => `
-            <div class="bg-white p-6 rounded-2xl shadow-md">
-                <div class="flex justify-between items-start mb-3">
+            <div class="bg-white p-4 md:p-6 rounded-2xl shadow-md">
+                <div class="flex flex-col md:flex-row justify-between items-start mb-3 gap-2">
                     <div>
-                        <p class="font-bold text-lg">${r.userName}</p>
-                        <p class="text-sm text-gray-500">${new Date(r.timestamp).toLocaleDateString()}</p>
+                        <p class="font-bold text-base md:text-lg">${r.userName}</p>
+                        <p class="text-xs md:text-sm text-gray-500">${new Date(r.timestamp).toLocaleDateString()}</p>
                     </div>
-                    <div class="flex gap-1">
-                        ${Array(r.rating).fill('⭐').join('')}
-                        <span class="ml-2 font-bold text-ntk-blue">${r.rating}/7</span>
+                    <div class="flex gap-1 items-center">
+                        <span class="text-sm md:text-base">${Array(r.rating).fill('⭐').join('')}</span>
+                        <span class="ml-2 font-bold text-ntk-blue text-sm md:text-base">${r.rating}/7</span>
                     </div>
                 </div>
-                <p class="text-gray-700 mb-4">${r.message}</p>
-                ${r.image ? `<img src="${r.image}" alt="Review" class="w-full max-w-md h-64 object-cover rounded-lg" />` : ''}
+                <p class="text-gray-700 mb-4 text-sm md:text-base">${r.message}</p>
+                ${r.image ? `<img src="${r.image}" alt="Review" class="w-full max-w-md h-48 md:h-64 object-cover rounded-lg" />` : ''}
             </div>
         `).join('');
     }
@@ -693,3 +719,4 @@
 </script>
 </body>
 </html>
+

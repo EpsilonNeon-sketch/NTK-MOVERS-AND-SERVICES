@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="./ntk logo 2.jpeg" />
+    <link rel="manifest" href="./manifest.json" />
     <title>NTK | Nicholas Kiboi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -38,9 +39,37 @@
                 <a href="#" onclick="showPage('reviews')" class="hover:text-yellow-400 transition">Reviews</a>
                 <span id="user-nav"></span>
                 <button onclick="showPage('admin-login')" class="bg-yellow-400 text-blue-900 px-2 md:px-4 py-1 rounded-full font-bold hover:bg-white transition text-xs md:text-base">Admin</button>
+                <button id="pwa-install-btn" style="display:none" class="ml-4 bg-white text-ntk-blue px-3 py-1 rounded-full font-bold border border-ntk-blue hover:bg-yellow-400 hover:text-blue-900 transition">Install App</button>
             </div>
             <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="hidden text-2xl">☰</button>
         </div>
+        <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js');
+            });
+        }
+
+        // PWA install prompt
+        let deferredPrompt;
+        const installBtn = document.getElementById('pwa-install-btn');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'inline-block';
+        });
+        installBtn && installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+        </script>
         <div id="mobile-menu" class="mt-4 space-y-2">
             <a href="#" onclick="showPage('home'); toggleMobileMenu()" class="block py-2 hover:bg-blue-900 px-2 rounded">Home</a>
             <a href="#" onclick="showPage('catalog'); toggleMobileMenu()" class="block py-2 hover:bg-blue-900 px-2 rounded">Catalog</a>
@@ -165,13 +194,12 @@
                     <input type="email" id="login-email" placeholder="Email" class="w-full p-3 border rounded-lg" required />
                     <input type="password" id="login-password" placeholder="Password" class="w-full p-3 border rounded-lg" required />
                     <button type="submit" class="w-full bg-ntk-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800">Login</button>
-                    <p id="login-user-error" class="text-red-500 text-sm hidden text-center">Invalid credentials</p>
                 </form>
+                <p id="login-error-msg" class="text-center mt-4 text-sm text-red-500 hidden">Invalid email or password.</p>
                 <p class="text-center mt-4 text-sm">Don't have an account? <a href="#" onclick="showPage('register')" class="text-ntk-blue font-bold">Register</a></p>
             </div>
         </section>
-
-        <!-- User Settings Page -->
+        <!-- Settings Page (now main user page) -->
         <section id="page-settings" class="page-content hidden">
             <div class="max-w-md mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-2xl">
                 <h2 class="text-xl md:text-2xl font-bold mb-6 text-center">Account Settings</h2>
@@ -183,8 +211,14 @@
                     <input type="email" id="set-email" placeholder="Email" class="w-full p-3 border rounded-lg" required readonly />
                     <button type="submit" class="w-full bg-ntk-blue text-white py-3 rounded-lg font-bold hover:bg-blue-800">Update Settings</button>
                 </form>
+                <div class="flex flex-col gap-2 mt-6">
+                    <button onclick="userLogout()" class="w-full bg-red-500 text-white py-3 rounded-lg font-bold hover:bg-red-700">Logout</button>
+                    <button onclick="showPage('home')" class="w-full bg-ntk-yellow text-blue-900 py-3 rounded-lg font-bold hover:bg-yellow-300">Back to Home</button>
+                </div>
             </div>
         </section>
+
+        <!-- ...settings page now handled above... -->
 
         <!-- Reviews Page -->
         <section id="page-reviews" class="page-content hidden">
@@ -281,15 +315,11 @@
         const nav = document.getElementById('user-nav');
         const navMobile = document.getElementById('user-nav-mobile');
         const content = currentUser ? `
-            <a href="#" onclick="showPage('settings')" class="hover:text-yellow-400 transition">Settings</a>
-            <button onclick="userLogout()" class="text-yellow-400 hover:text-white transition">Logout</button>
-        ` : `<a href="#" onclick="showPage('login')" class="hover:text-yellow-400 transition">Login</a>`;
-        
+            <a href="#" onclick="showPage('settings')" class="hover:text-yellow-400 transition">Account</a>
+        ` : '';
         const mobileContent = currentUser ? `
-            <a href="#" onclick="showPage('settings'); toggleMobileMenu()" class="block py-2 hover:bg-blue-900 px-2 rounded">Settings</a>
-            <button onclick="userLogout(); toggleMobileMenu()" class="w-full text-left py-2 hover:bg-blue-900 px-2 rounded">Logout</button>
-        ` : `<a href="#" onclick="showPage('login'); toggleMobileMenu()" class="block py-2 hover:bg-blue-900 px-2 rounded">Login</a>`;
-        
+            <a href="#" onclick="showPage('settings'); toggleMobileMenu()" class="block py-2 hover:bg-blue-900 px-2 rounded">Account</a>
+        ` : '';
         nav.innerHTML = content;
         navMobile.innerHTML = mobileContent;
     }
@@ -334,36 +364,36 @@
             email: document.getElementById('reg-email').value.trim(),
             password: document.getElementById('reg-password').value
         };
-
         if (users.find(u => u.email === user.email)) {
             alert('Email already registered');
             return;
         }
-
         users.push(user);
         localStorage.setItem('ntk_users', JSON.stringify(users));
         currentUser = user;
         localStorage.setItem('ntk_current_user', JSON.stringify(currentUser));
         updateUserNav();
-        showPage('home');
+        showPage('settings');
         showToast('Account created successfully!');
     });
 
+
+    // Login logic
     document.getElementById('login-form').addEventListener('submit', function(e) {
         e.preventDefault();
         const email = document.getElementById('login-email').value.trim();
         const password = document.getElementById('login-password').value;
         const user = users.find(u => u.email === email && u.password === password);
-
+        const errorMsg = document.getElementById('login-error-msg');
         if (user) {
             currentUser = user;
             localStorage.setItem('ntk_current_user', JSON.stringify(currentUser));
             updateUserNav();
-            showPage('home');
+            showPage('settings');
             showToast('Logged in successfully!');
-            document.getElementById('login-user-error').classList.add('hidden');
+            errorMsg.classList.add('hidden');
         } else {
-            document.getElementById('login-user-error').classList.remove('hidden');
+            errorMsg.classList.remove('hidden');
         }
     });
 
@@ -383,7 +413,7 @@
 
     function loadSettings() {
         if (!currentUser) {
-            showPage('login');
+            showPage('register');
             return;
         }
         document.getElementById('set-name').value = currentUser.name;
@@ -715,8 +745,11 @@
     window.onload = () => {
         renderCatalog();
         updateUserNav();
+        // If not logged in, show login page
+        if (!currentUser) {
+            showPage('login');
+        }
     };
 </script>
 </body>
 </html>
-
